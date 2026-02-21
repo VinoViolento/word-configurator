@@ -1,0 +1,58 @@
+<div class="app-container">
+	<div id="view-menu" class="view active">
+		<header class="main-header">
+			<div class="logo-area">EMERSON <span class="ms-fontWeight-light">DeltaV</span></div>
+			<h1 class="ms-font-xl">Configurador</h1>
+		</header>
+		<nav class="menu-grid">
+			<div class="menu-item" id="nav-to-general">
+				<i class="ms-Icon ms-Icon--DocumentManagement"></i>
+				<div class="menu-text">
+					<span class="title">Datos & Revisiones</span>
+					<span class="subtitle">Paso 1: Info base</span>
+				</div>
+				<div class="status-dot red" id="dot-general"></div>
+			</div>
+		</nav>
+	</div>
+
+	<div id="view-general" class="view">
+		<header class="view-header">
+			<button class="back-btn" id="nav-back-to-menu"><i class="ms-Icon ms-Icon--Back"></i></button>
+			<h2>Datos y Revisiones</h2>
+		</header>
+		<div class="view-content-container">
+			<div class="content-scroll">
+				<div class="form-group">
+					<label class="field-descriptor">Proyecto:</label>
+					<input type="text" id="projName" class="m-input-refined" placeholder="Nombre planta">
+                </div>
+					<div class="m-grid">
+						<div class="form-group">
+							<label class="field-descriptor">N° Propuesta:</label>
+							<input type="text" id="propNumber" class="m-input-refined">
+                    </div>
+							<div class="form-group">
+								<label class="field-descriptor">Versión:</label>
+								<input type="text" id="verNum" class="m-input-refined">
+                    </div>
+							</div>
+							<div class="form-group">
+								<label class="field-descriptor">Emisión:</label>
+								<select id="verDesc" class="m-input-refined">
+                        <option value="">Seleccione...</option>
+                        <option value="Emisión Presupuestaria">Emisión Presupuestaria</option>
+                        <option value="Emisión a Firme">Emisión a Firme</option>
+                    </select>
+							</div>
+						</div>
+						<div class="view-footer">
+							<button id="btn-action-general" class="m-btn-primary-flow">Siguiente</button>
+						</div>
+					</div>
+				</div>
+				<div id="clippie-float">
+					<div class="clippie-bubble" id="clippie-text">Cargando sistema...</div>
+					<div class="clippie-avatar" id="clippie-avatar">🤖</div>
+				</div>
+			</div>
