@@ -1,0 +1,11 @@
+{
+  "proyecto": { "nombre": "Suministro de 2 gabinetes marshalling", "propuesta": "S-2026-102", "version": "0", "emision": "Emisión a Firme" },
+  "tipo": "TRABAJO_MENOR",
+  "factores": { "nivelDocumentacion": "ESTANDAR" },
+  "gabinetes": [
+    { "id": "MAR-10", "tipo": "MARSHALLING", "plantilla": "MAR-X", "io": { "AI": 64, "AO": 16, "DI": 96, "DO": 48 }, "componentes": 110, "terminaciones": 900 },
+    { "id": "MAR-11", "tipo": "MARSHALLING", "plantilla": "MAR-X", "io": { "AI": 64, "AO": 16, "DI": 96, "DO": 48 }, "componentes": 110, "terminaciones": 900 }
+  ],
+  "actividades": { "excluir": ["SW_BASE_DATOS_IO", "SIT_PRECOM_LAZOS", "SIT_PRECOM_ENERGIZACION", "SIT_SAT"] },
+  "sitio": { "incluir": false }
+}

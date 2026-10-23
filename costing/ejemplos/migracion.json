@@ -1,0 +1,15 @@
+{
+  "proyecto": { "nombre": "Migración DCS legado → DeltaV", "propuesta": "P-2026-020", "version": "A", "emision": "Emisión Presupuestaria" },
+  "tipo": "MIGRACION",
+  "factores": { "complejidad": "ALTA", "nivelDocumentacion": "ESTANDAR", "libreriaTipicos": "PARCIAL", "condicionesSitio": "EXIGENTE" },
+  "drivers": {
+    "io_AI": 400, "io_AO": 120, "io_DI": 600, "io_DO": 300, "io_RTD_TC": 80, "io_HART": 300,
+    "io_SERIE_MODBUS": 600,
+    "controladores": 6, "estaciones": 8, "switches": 6,
+    "gabinetes": { "total": 6, "unicos": 3 }, "gabinetes_afectados": 10,
+    "componentes": 420, "terminaciones": 4800,
+    "modulos_simples": 500, "modulos_medios": 350, "modulos_complejos": 40, "fases_secuencia": 20,
+    "graficos_overview": 4, "graficos_proceso": 45, "graficos_detalle": 60, "graficos_tendencia": 30,
+    "alarmas": 2500, "interfaces_terceros": 5, "reportes": 6, "cursos_capacitacion": 4, "dias_pem": 20
+  }
+}

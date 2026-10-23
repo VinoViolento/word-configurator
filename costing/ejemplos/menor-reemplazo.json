@@ -1,0 +1,10 @@
+{
+  "proyecto": { "nombre": "Reemplazo de 6 tarjetas y 1 controlador", "propuesta": "S-2026-104", "version": "0", "emision": "Emisión a Firme" },
+  "tipo": "TRABAJO_MENOR",
+  "factores": { "condicionesSitio": "EXIGENTE" },
+  "alcance": [
+    { "tipo": "REEMPLAZO_COMPONENTE", "componente": "TARJETA", "cantidad": 6, "ioAfectado": 48 },
+    { "tipo": "REEMPLAZO_COMPONENTE", "componente": "CONTROLADOR", "cantidad": 1, "ioAfectado": 0 }
+  ],
+  "sitio": { "rotacionDias": 10, "horasViajeIda": 4 }
+}

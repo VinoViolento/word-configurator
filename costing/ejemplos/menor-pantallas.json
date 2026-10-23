@@ -1,0 +1,10 @@
+{
+  "proyecto": { "nombre": "Modificación de pantallas Área 300", "propuesta": "S-2026-101", "version": "0", "emision": "Emisión a Firme" },
+  "tipo": "TRABAJO_MENOR",
+  "factores": { "complejidad": "MEDIA", "nivelDocumentacion": "BASICO" },
+  "alcance": [
+    { "tipo": "MOD_PANTALLA", "tamano": "S", "cantidad": 6, "despliegue": "REMOTO" },
+    { "tipo": "MOD_PANTALLA", "tamano": "M", "cantidad": 3, "despliegue": "REMOTO" },
+    { "tipo": "MOD_LOGICA", "complejidad": "SIMPLE", "cantidad": 4, "despliegue": "REMOTO" }
+  ]
+}

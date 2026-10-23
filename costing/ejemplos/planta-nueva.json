@@ -1,0 +1,36 @@
+{
+  "proyecto": { "nombre": "Planta Nueva Ejemplo", "propuesta": "P-2026-001", "version": "A", "emision": "Emisión Presupuestaria" },
+  "tipo": "PLANTA_NUEVA",
+  "factores": { "complejidad": "MEDIA", "nivelDocumentacion": "ESTANDAR", "libreriaTipicos": "PARCIAL", "condicionesSitio": "NORMAL" },
+  "gabinetes": [
+    { "id": "SYS-01", "tipo": "SISTEMA", "plantilla": "SYS-A", "controladores": 2, "switches": 2, "estaciones": 0,
+      "tarjetas": [ { "modelo": "AI-8-HART", "cantidad": 12 }, { "modelo": "AO-8-HART", "cantidad": 4 }, { "modelo": "DI-32", "cantidad": 6 }, { "modelo": "DO-32", "cantidad": 3 }, { "modelo": "RTD-8", "cantidad": 4 } ] },
+    { "id": "SYS-02", "tipo": "SISTEMA", "plantilla": "SYS-A", "controladores": 2, "switches": 2,
+      "tarjetas": [ { "modelo": "AI-8-HART", "cantidad": 12 }, { "modelo": "AO-8-HART", "cantidad": 4 }, { "modelo": "DI-32", "cantidad": 6 }, { "modelo": "DO-32", "cantidad": 3 }, { "modelo": "RTD-8", "cantidad": 4 } ] },
+    { "id": "SYS-03", "tipo": "SISTEMA", "controladores": 2, "switches": 2,
+      "tarjetas": [ { "modelo": "AI-8-HART", "cantidad": 6 }, { "modelo": "DI-32", "cantidad": 4 }, { "modelo": "DO-32", "cantidad": 2 }, { "modelo": "SERIAL-2P", "cantidad": 1 }, { "modelo": "FF-H1-2P", "cantidad": 2, "dispositivos": 12 } ] },
+    { "id": "MAR-01", "tipo": "MARSHALLING", "plantilla": "MAR-A", "io": { "AI": 144, "AO": 32, "DI": 192, "DO": 96, "RTD_TC": 32 } },
+    { "id": "MAR-02", "tipo": "MARSHALLING", "plantilla": "MAR-A", "io": { "AI": 144, "AO": 32, "DI": 192, "DO": 96, "RTD_TC": 32 } },
+    { "id": "MAR-03", "tipo": "MARSHALLING", "io": { "AI": 48, "DI": 128, "DO": 64 } },
+    { "id": "NET-01", "tipo": "RED", "switches": 4, "estaciones": 6 }
+  ],
+  "drivers": {
+    "io_SERIE_MODBUS": 400,
+    "modulos_simples": 300,
+    "modulos_medios": { "total": 260, "unicos": 60 },
+    "modulos_complejos": 30,
+    "fases_secuencia": 12,
+    "graficos_overview": 3,
+    "graficos_proceso": { "total": 28, "unicos": 20 },
+    "graficos_detalle": 40,
+    "graficos_tendencia": 20,
+    "alarmas": 1500,
+    "alarmas_racionalizar": 400,
+    "interfaces_terceros": 3,
+    "reportes": 4,
+    "cursos_capacitacion": 3,
+    "dias_pem": 15
+  },
+  "sitio": { "coberturaFAT": 0.8, "rotacionDias": 20, "horasViajeIda": 8 },
+  "tarifas": { "moneda": "USD", "GP": 95, "LI": 90, "IS": 75, "IH": 75, "DT": 50, "QA": 60, "TT": 40, "IC": 80, "TS": 55, "INST": 75, "viatico": 150, "viaje": 900 }
+}

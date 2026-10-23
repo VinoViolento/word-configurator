@@ -1,0 +1,24 @@
+{
+  "proyecto": { "nombre": "Expansión Unidad 200", "propuesta": "P-2026-014", "version": "0", "emision": "Emisión a Firme" },
+  "tipo": "EXPANSION",
+  "factores": { "complejidad": "MEDIA", "nivelDocumentacion": "RIGUROSO", "libreriaTipicos": "COMPLETA", "condicionesSitio": "EXIGENTE" },
+  "gabinetes": [
+    { "id": "SYS-04", "tipo": "SISTEMA", "controladores": 1, "switches": 2,
+      "tarjetas": [ { "modelo": "CHARM-BASEPLATE", "cantidad": 8 }, { "modelo": "CHARM-AI", "cantidad": 40 }, { "modelo": "CHARM-AO", "cantidad": 12 }, { "modelo": "CHARM-DI", "cantidad": 32 }, { "modelo": "CHARM-DO", "cantidad": 12 } ] },
+    { "id": "SYS-01", "tipo": "SISTEMA", "existente": true },
+    { "id": "NET-01", "tipo": "RED", "existente": true }
+  ],
+  "drivers": {
+    "modulos_simples": 40,
+    "modulos_medios": 50,
+    "modulos_complejos": 4,
+    "graficos_proceso": 4,
+    "graficos_detalle": 6,
+    "graficos_mod_M": 3,
+    "alarmas": 200,
+    "dias_pem": 5,
+    "cursos_capacitacion": 1
+  },
+  "sitio": { "rotacionDias": 15 },
+  "tarifas": { "moneda": "USD", "defecto": 75, "TT": 40, "DT": 50, "viatico": 150, "viaje": 600 }
+}

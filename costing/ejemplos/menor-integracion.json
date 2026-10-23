@@ -1,0 +1,8 @@
+{
+  "proyecto": { "nombre": "Integración de 12 relés y 2 fuentes en SYS-02", "propuesta": "S-2026-103", "version": "0", "emision": "Emisión a Firme" },
+  "tipo": "TRABAJO_MENOR",
+  "alcance": [
+    { "tipo": "INTEGRACION_MATERIALES", "componentes": 14, "terminaciones": 70, "gabinetesAfectados": 1 }
+  ],
+  "sitio": { "incluir": false }
+}
