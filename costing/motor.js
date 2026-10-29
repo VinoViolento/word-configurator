@@ -253,6 +253,17 @@
     return r;
   }
 
+  function resolverTurno(nombreOObj, params, R, h) {
+    const base = typeof nombreOObj === 'string' ? params.turnos[nombreOObj] : nombreOObj;
+    if (!base) throw new Error(`Turno desconocido: ${nombreOObj}. Use ${Object.keys(params.turnos).join(', ')}`);
+    const t = Object.assign({}, params.turnos.ESTANDAR, base);
+    return {
+      nombre: typeof nombreOObj === 'string' ? nombreOObj : (base.nombre || 'PERSONALIZADO'),
+      diasTrabajo: t.diasTrabajo || R, diasDescanso: t.diasDescanso || 0,
+      horasDia: t.horasDia || h, relevo: t.relevo !== false, horasPorDiaDescanso: t.horasPorDiaDescanso || 0
+    };
+  }
+
   function calendarioSitio(actividades, calculadas, entrada, plantilla, params) {
     const h = params.jornada.horasDiaSitio;
     const kappa = params.cuadrillas.kappa, effMin = params.cuadrillas.eficienciaMinima, cMax = params.cuadrillas.personasMaximas;
@@ -262,6 +273,7 @@
     const dViaje = params.movilizacion.diasViajePorViaje;
     const presencia = sit.presenciaLider != null ? sit.presenciaLider : (plantilla.presenciaLider != null ? plantilla.presenciaLider : params.movilizacion.presenciaLider);
     const overridesFases = sit.fases || {};
+    const turnosCfg = sit.turnos || plantilla.turnos || {};
 
     // Definición de fases: por plantilla, o unificadas en una sola cuadrilla (trabajos menores)
     let defs = plantilla.fasesSitio;
@@ -272,50 +284,77 @@
     }
 
     const fases = [];
-    let diasCal = 0, diasPersona = 0, prevDias = 0;
-    const perfil = []; // perfil de dotación: [{personas, dias}] para contar viajes por persona
+    let diasCal = 0, diasTrabajoTotal = 0, diasPersona = 0, prevDias = 0, horasLider = 0, diasLider = 0, viajesLider = 0, diasDescanso = 0, horasDescanso = 0;
+    const perfil = []; // perfil de dotación por fase para contar viajes y descansos por puesto
     defs.forEach(fd => {
       const ov = overridesFases[fd.fase] || {};
       const acts = Object.values(calculadas).filter(x => x.lugar === 'SITIO' && x.tipo === 'DIRECTA' && (fd.agrupa ? fd.agrupa.includes(x.fase) : x.fase === fd.fase));
       const H = acts.reduce((s, x) => s + x.horas, 0);
       if (H <= 0) return;
+      const turno = resolverTurno(ov.turno || turnosCfg[fd.fase] || turnosCfg.porDefecto || 'ESTANDAR', params, R, h);
+      const hDia = turno.horasDia;
       let forzado = ov.personas;
       if (fd.fase === 'PEM' && sit.personasPem) forzado = sit.personasPem;
-      const dim = dimensionarCuadrilla(H, fd.personas, cMax, ov.diasObjetivo != null ? ov.diasObjetivo : fd.diasObjetivo, h, kappa, effMin, forzado);
-      const { personas: c, eficiencia: eff, dias } = dim;
-      const horasCalendario = c * h * dias;
+      const dim = dimensionarCuadrilla(H, fd.personas, cMax, ov.diasObjetivo != null ? ov.diasObjetivo : fd.diasObjetivo, hDia, kappa, effMin, forzado);
+      const { personas: c, eficiencia: eff, dias: diasTrabajo } = dim;   // días efectivamente trabajados por puesto
+      const ciclo = turno.diasTrabajo + turno.diasDescanso;
+      const diasCalendario = turno.relevo ? diasTrabajo : Math.ceil(diasTrabajo * ciclo / turno.diasTrabajo);
+      const horasCalendario = c * hDia * diasTrabajo;
       const solape = ov.solape != null ? ov.solape : (fd.solape || 0);
-      diasCal += dias - Math.min(dias, prevDias) * solape;
-      diasPersona += c * dias;
-      perfil.push({ personas: c, dias });
-      fases.push({ fase: fd.fase, agrupa: fd.agrupa, actividades: acts.map(x => x.id), horasModelo: r1(H), personas: c, eficiencia: eff, dias, horasCalendario, ajuste: r1(horasCalendario - H), solape });
-      prevDias = dias;
-      // Fila de ajuste: la cuadrilla está jornadas completas aunque el modelo dé horas fraccionarias
+      const diasCalEfectivos = diasCalendario - Math.min(diasCalendario, prevDias) * solape;
+      diasCal += diasCalEfectivos;
+      diasTrabajoTotal += diasTrabajo;
+      diasPersona += c * diasTrabajo;
+      // Líder técnico: trabaja el mismo régimen que la cuadrilla de la fase
+      const diasLiderFase = presencia * diasTrabajo * (diasCalEfectivos / diasCalendario);
+      const horasLiderFase = diasLiderFase * hDia;
+      horasLider += horasLiderFase; diasLider += diasLiderFase;
+      viajesLider += diasLiderFase / turno.diasTrabajo;
+      // Descanso de la cuadrilla (persona en descanso por cada puesto cuando hay relevo, o la propia cuadrilla si no)
+      const descansoFase = c * diasTrabajo * turno.diasDescanso / turno.diasTrabajo;
+      diasDescanso += descansoFase;
+      const horasDescansoFase = descansoFase * turno.horasPorDiaDescanso;
+      horasDescanso += horasDescansoFase;
+      perfil.push({ personas: c, diasTrabajo, T: turno.diasTrabajo });
+      fases.push({
+        fase: fd.fase, agrupa: fd.agrupa, actividades: acts.map(x => x.id), horasModelo: r1(H),
+        turno: turno.nombre, horasDia: hDia, relevo: turno.relevo,
+        personas: c, personasTotales: turno.relevo && turno.diasDescanso > 0 ? c * 2 : c, eficiencia: eff,
+        dias: diasTrabajo, diasCalendario, horasCalendario, ajuste: r1(horasCalendario - H), solape,
+        diasDescanso: r1(descansoFase), horasLider: r1(horasLiderFase)
+      });
+      prevDias = diasCalendario;
       const ajuste = horasCalendario - H;
       if (ajuste > 0.05) {
         const id = 'SIT_AJUSTE_' + fd.fase;
-        calculadas[id] = { id, nombre: `Ajuste a jornadas completas (${fd.fase}: ${c} pers. × ${dias} d × ${h} h)`, lugar: 'SITIO', fase: fd.fase, rol: acts[0].rol, tipo: 'AJUSTE', horas: ajuste, media: ajuste, sigma: 0, factores: {}, factorTotal: 1, etiquetas: [] };
+        calculadas[id] = { id, nombre: `Ajuste a jornadas completas (${fd.fase}: ${c} pers. × ${diasTrabajo} d × ${hDia} h, turno ${turno.nombre})`, lugar: 'SITIO', fase: fd.fase, rol: acts[0].rol, tipo: 'AJUSTE', horas: ajuste, media: ajuste, sigma: 0, factores: {}, factorTotal: 1, etiquetas: [] };
+      }
+      if (horasDescansoFase > 0.05) {
+        const id = 'SIT_DESCANSO_' + fd.fase;
+        calculadas[id] = { id, nombre: `Días de descanso facturados (${fd.fase}, turno ${turno.nombre})`, lugar: 'SITIO', fase: fd.fase, rol: acts[0].rol, tipo: 'AJUSTE', horas: horasDescansoFase, media: horasDescansoFase, sigma: 0, factores: {}, factorTotal: 1, etiquetas: [] };
       }
     });
     diasCal = Math.ceil(diasCal);
-    const diasLider = Math.ceil(diasCal * presencia);
+    diasLider = Math.ceil(diasLider);
+    horasLider = r1(horasLider);
+    viajesLider = Math.ceil(viajesLider);
 
-    // Viajes por "puesto" de cuadrilla: el puesto i viaja en todas las fases con >= i personas (la misma
-    // persona encadena fases consecutivas), rotando cada R días.
+    // Viajes por puesto: el puesto i viaja en todas las fases con >= i personas, un viaje por ciclo de trabajo.
     const maxC = perfil.reduce((m, p) => Math.max(m, p.personas), 0);
     let viajes = 0;
     const viajesPorPuesto = [];
     for (let i = 1; i <= maxC; i++) {
-      const dias = perfil.filter(p => p.personas >= i).reduce((s, p) => s + p.dias, 0);
-      const v = Math.ceil(dias / R); viajes += v; viajesPorPuesto.push({ puesto: i, dias, viajes: v });
+      const ciclos = perfil.filter(p => p.personas >= i).reduce((s, p) => s + p.diasTrabajo / p.T, 0);
+      const dias = perfil.filter(p => p.personas >= i).reduce((s, p) => s + p.diasTrabajo, 0);
+      const v = Math.ceil(ciclos); viajes += v; viajesPorPuesto.push({ puesto: i, dias, viajes: v });
     }
-    const viajesLider = diasLider > 0 ? Math.ceil(diasLider / R) : 0;
     viajes += viajesLider;
     diasPersona += diasLider;
     return {
-      fases, diasCalendario: diasCal, diasLider, horasLider: diasLider * h, presenciaLider: presencia,
+      fases, diasCalendario: diasCal, diasTrabajo: diasTrabajoTotal, diasLider, horasLider, presenciaLider: presencia,
       viajes, viajesPorPuesto, viajesLider, horasViaje: viajes * 2 * hViaje,
-      diasViatico: diasPersona + viajes * dViaje, rotacionDias: R, horasDia: h, unificado: !!unificado
+      diasDescanso: Math.ceil(diasDescanso), horasDescanso: r1(horasDescanso),
+      diasViatico: Math.ceil(diasPersona + viajes * dViaje), rotacionDias: R, horasDia: h, unificado: !!unificado
     };
   }
 
@@ -485,8 +524,7 @@
     mapa = Object.assign({}, MAPA_SERVICIOS, mapa || {});
     const s = r.sitio;
     const out = {};
-    ORDEN_SERVICIOS.forEach(k => { out[k] = { servicio: k, nombre: NOMBRE_SERVICIOS[k], fases: [], horasActividades: 0, horasAjuste: 0, horasLider: 0, horasViaje: 0, total: 0, dias: 0, diasPersona: 0, personasMax: 0, viajes: 0, diasViatico: 0 }; });
-    const totDias = s.fases.reduce((a, f) => a + f.dias, 0) || 1;
+    ORDEN_SERVICIOS.forEach(k => { out[k] = { servicio: k, nombre: NOMBRE_SERVICIOS[k], fases: [], horasActividades: 0, horasAjuste: 0, horasLider: 0, horasViaje: 0, total: 0, dias: 0, diasCalendario: 0, diasPersona: 0, personasMax: 0, viajes: 0, diasViatico: 0, diasDescanso: 0, turnos: [] }; });
     const totPD = s.fases.reduce((a, f) => a + f.personas * f.dias, 0) || 1;
     s.fases.forEach(f => {
       const fasesFuente = f.agrupa || [f.fase];
@@ -496,11 +534,12 @@
       o.fases.push(f.fase);
       const acts = r.actividades.filter(a => a.lugar === 'SITIO' && fasesFuente.includes(a.fase) && a.tipo === 'DIRECTA');
       o.horasActividades += acts.reduce((a, x) => a + x.horas, 0);
-      o.horasAjuste += f.ajuste;
-      o.horasLider += s.horasLider * f.dias / totDias;
+      o.horasAjuste += f.ajuste + (r.actividades.find(a => a.id === 'SIT_DESCANSO_' + f.fase) || { horas: 0 }).horas;
+      o.horasLider += f.horasLider;
       o.horasViaje += s.horasViaje * (f.personas * f.dias) / totPD;
       o.viajes += s.viajes * (f.personas * f.dias) / totPD;
-      o.dias += f.dias; o.diasPersona += f.personas * f.dias; o.personasMax = Math.max(o.personasMax, f.personas);
+      o.dias += f.dias; o.diasCalendario += f.diasCalendario; o.diasPersona += f.personas * f.dias; o.personasMax = Math.max(o.personasMax, f.personasTotales);
+      o.diasDescanso += f.diasDescanso; o.turnos.push(f.turno);
       o.diasViatico += s.diasViatico * (f.personas * f.dias) / totPD;
     });
     const lista = ORDEN_SERVICIOS.map(k => out[k]).filter(o => o.fases.length);
@@ -535,12 +574,12 @@
     L.push(`HORAS POR FASE  : ${Object.entries(r.horas.porFase).map(([k, v]) => `${k}=${v}`).join('  ')}`);
     if (r.sitio.fases.length) {
       L.push('');
-      L.push('SITIO: ' + r.sitio.fases.map(f => `${f.fase}: ${f.horasModelo} h → ${f.personas} pers × ${f.dias} d (ef ${f.eficiencia})`).join(' | '));
-      L.push(`       días calendario=${r.sitio.diasCalendario}  líder=${r.sitio.diasLider} d (${r.sitio.horasLider} h)  viajes=${r.sitio.viajes} (${r.sitio.horasViaje} h)  días viático=${r.sitio.diasViatico}`);
+      L.push('SITIO: ' + r.sitio.fases.map(f => `${f.fase}: ${f.horasModelo} h → ${f.personas} pers × ${f.dias} d × ${f.horasDia} h [${f.turno}${f.relevo && f.diasDescanso ? ', relevo' : ''}, ${f.diasCalendario} d cal.] (ef ${f.eficiencia})`).join(' | '));
+      L.push(`       días calendario=${r.sitio.diasCalendario}  líder=${r.sitio.diasLider} d (${r.sitio.horasLider} h)  viajes=${r.sitio.viajes} (${r.sitio.horasViaje} h)  días viático=${r.sitio.diasViatico}  días descanso=${r.sitio.diasDescanso}`);
       const sv = serviciosSitio(r);
       L.push('');
-      L.push(pad('SERVICIO EN SITIO', 26) + num('ACTIV.', 9) + num('AJUSTE', 8) + num('LÍDER', 8) + num('VIAJE', 8) + num('TOTAL h', 9) + num('DÍAS', 6) + num('PERS', 6) + num('VIAJES', 8) + num('VIÁTICOS', 10));
-      sv.servicios.forEach(o => L.push(pad(o.nombre, 26) + num(o.horasActividades, 9) + num(o.horasAjuste, 8) + num(o.horasLider, 8) + num(o.horasViaje, 8) + num(o.total, 9) + num(o.dias, 6) + num(o.personasMax, 6) + num(o.viajes, 8) + num(o.diasViatico, 10)));
+      L.push(pad('SERVICIO EN SITIO', 26) + num('ACTIV.', 9) + num('AJUSTE', 8) + num('LÍDER', 8) + num('VIAJE', 8) + num('TOTAL h', 9) + num('D.TRAB', 7) + num('D.CAL', 6) + num('PERS', 6) + num('VIAJES', 8) + num('VIÁTICOS', 10) + '  TURNO');
+      sv.servicios.forEach(o => L.push(pad(o.nombre, 26) + num(o.horasActividades, 9) + num(o.horasAjuste, 8) + num(o.horasLider, 8) + num(o.horasViaje, 8) + num(o.total, 9) + num(o.dias, 7) + num(o.diasCalendario, 6) + num(o.personasMax, 6) + num(o.viajes, 8) + num(o.diasViatico, 10) + '  ' + [...new Set(o.turnos)].join('/')));
       L.push(pad('TOTAL SITIO', 26) + num('', 9) + num('', 8) + num('', 8) + num('', 8) + num(sv.total, 9));
     }
     L.push(`DURACIÓN: equipo oficina=${r.duracion.equipoOficina}  semanas oficina=${r.duracion.semanasOficina}  semanas sitio=${r.duracion.semanasSitio}  total=${r.duracion.semanasTotales}`);

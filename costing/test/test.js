@@ -111,7 +111,7 @@ test('ajuste a jornadas completas: horas calendario de cada fase = personas × d
   const r = motor.calcular(ejemplo('expansion.json'));
   r.sitio.fases.forEach(f => {
     const acts = r.actividades.filter(a => a.lugar === 'SITIO' && a.fase === f.fase && (a.tipo === 'DIRECTA' || a.tipo === 'AJUSTE'));
-    casi(acts.reduce((s, a) => s + a.horas, 0), f.personas * f.dias * r.sitio.horasDia, 0.5, f.fase);
+    casi(acts.reduce((s, a) => s + a.horas, 0), f.personas * f.dias * f.horasDia, 0.5, f.fase);
   });
 });
 test('viajes por puesto: una persona encadena fases (trabajo menor de 7 días → 1 viaje)', () => {
@@ -147,6 +147,30 @@ test('gabinetes + drivers manuales se suman (únicos incluidos)', () => {
   const r = motor.calcular({ tipo: 'TRABAJO_MENOR', sitio: { incluir: false }, gabinetes: [{ id: 'A', tipo: 'MARSHALLING', io: { AI: 8 } }], drivers: { gabinetes: { total: 2, unicos: 1 } } });
   assert.deepStrictEqual(r.drivers.gabinetes, { total: 3, unicos: 2 });
 });
+
+console.log('Turnos');
+test('turno 7x7 con relevo: 12 h/día, viaje cada 7 días trabajados, descanso = días trabajados, calendario = días trabajados', () => {
+  const e = motor.deepMerge(ejemplo('planta-nueva.json'), { sitio: { turnos: { porDefecto: '7x7' }, fases: { PRECOM: { personas: 2 } } } });
+  const r = motor.calcular(e);
+  const f = r.sitio.fases.find(x => x.fase === 'PRECOM');
+  assert.strictEqual(f.horasDia, 12); assert.strictEqual(f.diasCalendario, f.dias); assert.strictEqual(f.personasTotales, 4);
+  casi(f.diasDescanso, f.personas * f.dias, 0.01);
+  assert.strictEqual(r.sitio.viajesPorPuesto[0].viajes, Math.ceil(r.sitio.viajesPorPuesto[0].dias / 7));
+});
+test('turno 4x3 sin relevo estira el calendario en 7/4', () => {
+  const e = motor.deepMerge(ejemplo('planta-nueva.json'), { sitio: { turnos: { porDefecto: '4x3' } } });
+  const f = motor.calcular(e).sitio.fases.find(x => x.fase === 'MONTAJE');
+  assert.strictEqual(f.diasCalendario, Math.ceil(f.dias * 7 / 4)); assert.strictEqual(f.personasTotales, f.personas);
+});
+test('turno por fase y descanso facturado opcional', () => {
+  const e = motor.deepMerge(ejemplo('planta-nueva.json'), { sitio: { turnos: { porDefecto: '4x3', PRECOM: '7x7' } }, parametros: { turnos: { '7x7': { horasPorDiaDescanso: 8 } } } });
+  const r = motor.calcular(e);
+  assert.strictEqual(r.sitio.fases.find(x => x.fase === 'PRECOM').turno, '7x7');
+  assert.strictEqual(r.sitio.fases.find(x => x.fase === 'SAT').turno, '4x3');
+  assert.ok(r.actividades.find(a => a.id === 'SIT_DESCANSO_PRECOM').horas > 0);
+  casi(motor.serviciosSitio(r).total, r.horas.porLugar.SITIO, 1.0);
+});
+test('turno desconocido lanza error', () => { assert.throws(() => motor.calcular({ tipo: 'PLANTA_NUEVA', drivers: { io_AI: 100 }, sitio: { turnos: { porDefecto: '9x9' } } })); });
 
 console.log('Servicios de sitio');
 test('serviciosSitio reparte todo el sitio en 5 servicios sin perder horas', () => {

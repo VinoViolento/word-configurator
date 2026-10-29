@@ -87,6 +87,24 @@
       presenciaLider: 1.0   // fracción de los días calendario que el líder técnico está en sitio
     },
 
+    /**
+     * Regímenes de turno en sitio. Se asignan por fase con `sitio.turnos` ({ porDefecto, PRECOM, COM, ... }).
+     *  diasTrabajo / diasDescanso : ciclo del turno (null => usa movilizacion.rotacionDias / jornada.horasDiaSitio)
+     *  horasDia                   : horas efectivas por jornada
+     *  relevo                     : true => el puesto se cubre todos los días con 2 personas alternadas
+     *                               (el calendario avanza en días trabajados); false => la cuadrilla descansa
+     *                               y el calendario se estira en (T+D)/T
+     *  horasPorDiaDescanso        : horas a facturar por día de descanso (0 = el descanso va en la tarifa)
+     */
+    turnos: {
+      ESTANDAR: { diasTrabajo: null, diasDescanso: 0, horasDia: null, relevo: true, horasPorDiaDescanso: 0 },
+      '7x7':    { diasTrabajo: 7, diasDescanso: 7, horasDia: 12, relevo: true, horasPorDiaDescanso: 0 },
+      '14x14':  { diasTrabajo: 14, diasDescanso: 14, horasDia: 12, relevo: true, horasPorDiaDescanso: 0 },
+      '10x5':   { diasTrabajo: 10, diasDescanso: 5, horasDia: 10, relevo: false, horasPorDiaDescanso: 0 },
+      '4x3':    { diasTrabajo: 4, diasDescanso: 3, horasDia: 10, relevo: false, horasPorDiaDescanso: 0 },
+      '5x2':    { diasTrabajo: 5, diasDescanso: 2, horasDia: 10, relevo: false, horasPorDiaDescanso: 0 }
+    },
+
     /** Transferencia de calidad FAT -> COM: H_COM = H_COM0 * (1 - tau * coberturaFAT). */
     transferenciaFAT: { tau: 0.3, coberturaPorDefecto: { PLANTA_NUEVA: 0.8, EXPANSION: 0.6, MIGRACION: 0.6, TRABAJO_MENOR: 0.0 } },
 
