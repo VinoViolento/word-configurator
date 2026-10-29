@@ -575,9 +575,9 @@
       lugar: 'SITIO', fase: 'PRECOM', rol: 'IC',
       // trabajo del proveedor DCS aunque el loop check lo haga un tercero: direcciones, GSD/mapas, diagnóstico, estados y comandos
       terminos: [
-        { driver: 'io_FF', unitario: 1.2 },
-        { driver: 'io_PROFIBUS', unitario: 1.0 },
-        { driver: 'interfaces_terceros', unitario: 6 },
+        { driver: 'io_FF', unitario: 1.2, clon: 0.5, phi: 'interfaces' },
+        { driver: 'io_PROFIBUS', unitario: 1.0, clon: 0.5, phi: 'interfaces' },
+        { driver: 'interfaces_terceros', unitario: 6, clon: 0.5, phi: 'interfaces' },
         { driver: 'puntos_interfaz', unitario: 0.05 }
       ],
       factores: ['condicionesSitio', 'brownfield'],
