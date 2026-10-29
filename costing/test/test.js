@@ -148,6 +148,20 @@ test('gabinetes + drivers manuales se suman (únicos incluidos)', () => {
   assert.deepStrictEqual(r.drivers.gabinetes, { total: 3, unicos: 2 });
 });
 
+console.log('Servicios de sitio');
+test('serviciosSitio reparte todo el sitio en 5 servicios sin perder horas', () => {
+  const r = motor.calcular(ejemplo('planta-nueva.json'));
+  const sv = motor.serviciosSitio(r);
+  casi(sv.total, r.horas.porLugar.SITIO, 1.0);
+  assert.ok(sv.servicios.every(o => ['SUPERVISION_MONTAJE', 'PRECOM', 'COM', 'SAT', 'PEM'].includes(o.servicio)));
+  casi(sv.servicios.reduce((a, o) => a + o.horasLider, 0), r.sitio.horasLider, 1.0);
+  casi(sv.servicios.reduce((a, o) => a + o.viajes, 0), r.sitio.viajes, 0.6);
+});
+test('serviciosSitio en trabajo menor unificado también cuadra', () => {
+  const r = motor.calcular(ejemplo('menor-reemplazo.json'));
+  casi(motor.serviciosSitio(r).total, r.horas.porLugar.SITIO, 0.5);
+});
+
 console.log('Costo y optimización');
 test('costear: total = horas + viáticos + viajes + contingencia', () => {
   const e = ejemplo('planta-nueva.json'); const r = motor.calcular(e); const c = motor.costear(r, e.tarifas);

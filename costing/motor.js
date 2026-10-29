@@ -470,6 +470,47 @@
     return { personasPorFase, resultado: fin.r, costo: fin.c, evaluaciones, entradaOptimizada: ent };
   }
 
+  // ───────────────────────── servicios de sitio ─────────────────────────
+  /** Fase del calendario → servicio comercial. */
+  const MAPA_SERVICIOS = { MONTAJE: 'SUPERVISION_MONTAJE', SERVICIO: 'COM', PRECOM: 'PRECOM', CUTOVER: 'PRECOM', COM: 'COM', SAT: 'SAT', PEM: 'PEM', CAPACITACION: 'PEM', SITIO: 'COM' };
+  const ORDEN_SERVICIOS = ['SUPERVISION_MONTAJE', 'PRECOM', 'COM', 'SAT', 'PEM'];
+  const NOMBRE_SERVICIOS = { SUPERVISION_MONTAJE: 'Supervisión al montaje', PRECOM: 'Pre-comisionamiento', COM: 'Comisionamiento', SAT: 'SAT', PEM: 'Puesta en marcha (PEM)' };
+
+  /**
+   * Agrupa el sitio en servicios (supervisión al montaje, pre-com, com, SAT, PEM).
+   * Líder técnico se reparte por días calendario de cada fase; traslados y viáticos por días-persona.
+   * Capacitación se presenta dentro de PEM y cutover dentro de pre-com (configurable con `mapa`).
+   */
+  function serviciosSitio(r, mapa) {
+    mapa = Object.assign({}, MAPA_SERVICIOS, mapa || {});
+    const s = r.sitio;
+    const out = {};
+    ORDEN_SERVICIOS.forEach(k => { out[k] = { servicio: k, nombre: NOMBRE_SERVICIOS[k], fases: [], horasActividades: 0, horasAjuste: 0, horasLider: 0, horasViaje: 0, total: 0, dias: 0, diasPersona: 0, personasMax: 0, viajes: 0, diasViatico: 0 }; });
+    const totDias = s.fases.reduce((a, f) => a + f.dias, 0) || 1;
+    const totPD = s.fases.reduce((a, f) => a + f.personas * f.dias, 0) || 1;
+    s.fases.forEach(f => {
+      const fasesFuente = f.agrupa || [f.fase];
+      // una fase unificada (trabajos menores) se asigna al servicio de la primera fase con horas
+      const k = mapa[f.fase] || 'COM';
+      const o = out[k]; if (!o) return;
+      o.fases.push(f.fase);
+      const acts = r.actividades.filter(a => a.lugar === 'SITIO' && fasesFuente.includes(a.fase) && a.tipo === 'DIRECTA');
+      o.horasActividades += acts.reduce((a, x) => a + x.horas, 0);
+      o.horasAjuste += f.ajuste;
+      o.horasLider += s.horasLider * f.dias / totDias;
+      o.horasViaje += s.horasViaje * (f.personas * f.dias) / totPD;
+      o.viajes += s.viajes * (f.personas * f.dias) / totPD;
+      o.dias += f.dias; o.diasPersona += f.personas * f.dias; o.personasMax = Math.max(o.personasMax, f.personas);
+      o.diasViatico += s.diasViatico * (f.personas * f.dias) / totPD;
+    });
+    const lista = ORDEN_SERVICIOS.map(k => out[k]).filter(o => o.fases.length);
+    lista.forEach(o => {
+      o.total = r1(o.horasActividades + o.horasAjuste + o.horasLider + o.horasViaje);
+      ['horasActividades', 'horasAjuste', 'horasLider', 'horasViaje', 'viajes', 'diasViatico'].forEach(c => { o[c] = r1(o[c]); });
+    });
+    return { servicios: lista, total: r1(lista.reduce((a, o) => a + o.total, 0)), horasSitioModelo: r.horas.porLugar.SITIO };
+  }
+
   // ───────────────────────── reporte ─────────────────────────
   function reporteTexto(r, costo) {
     const L = [];
@@ -496,6 +537,11 @@
       L.push('');
       L.push('SITIO: ' + r.sitio.fases.map(f => `${f.fase}: ${f.horasModelo} h → ${f.personas} pers × ${f.dias} d (ef ${f.eficiencia})`).join(' | '));
       L.push(`       días calendario=${r.sitio.diasCalendario}  líder=${r.sitio.diasLider} d (${r.sitio.horasLider} h)  viajes=${r.sitio.viajes} (${r.sitio.horasViaje} h)  días viático=${r.sitio.diasViatico}`);
+      const sv = serviciosSitio(r);
+      L.push('');
+      L.push(pad('SERVICIO EN SITIO', 26) + num('ACTIV.', 9) + num('AJUSTE', 8) + num('LÍDER', 8) + num('VIAJE', 8) + num('TOTAL h', 9) + num('DÍAS', 6) + num('PERS', 6) + num('VIAJES', 8) + num('VIÁTICOS', 10));
+      sv.servicios.forEach(o => L.push(pad(o.nombre, 26) + num(o.horasActividades, 9) + num(o.horasAjuste, 8) + num(o.horasLider, 8) + num(o.horasViaje, 8) + num(o.total, 9) + num(o.dias, 6) + num(o.personasMax, 6) + num(o.viajes, 8) + num(o.diasViatico, 10)));
+      L.push(pad('TOTAL SITIO', 26) + num('', 9) + num('', 8) + num('', 8) + num('', 8) + num(sv.total, 9));
     }
     L.push(`DURACIÓN: equipo oficina=${r.duracion.equipoOficina}  semanas oficina=${r.duracion.semanasOficina}  semanas sitio=${r.duracion.semanasSitio}  total=${r.duracion.semanasTotales}`);
     L.push(`INCERTIDUMBRE: media=${r.incertidumbre.media}  σ=${r.incertidumbre.sigma} (CV ${r.incertidumbre.coefVariacion})  P80=${r.incertidumbre.P80}  P90=${r.incertidumbre.P90}`);
@@ -508,5 +554,5 @@
     return L.join('\n');
   }
 
-  return { calcular, costear, optimizarCuadrillas, reporteTexto, pert, cantidadEfectiva, deepMerge, PARAMETROS, CATALOGO, PLANTILLAS, GABINETES };
+  return { calcular, costear, optimizarCuadrillas, serviciosSitio, reporteTexto, pert, cantidadEfectiva, deepMerge, PARAMETROS, CATALOGO, PLANTILLAS, GABINETES };
 });
