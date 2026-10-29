@@ -88,6 +88,7 @@
       horasViajeIda: 8,     // horas-persona por tramo (ida o vuelta)
       diasViajePorViaje: 2, // días de viático que consume un viaje ida+vuelta
       presenciaLider: 1.0,  // fracción de los días calendario que el líder técnico está en sitio
+      liderSoloConCuadrilla: true, // el líder se suma sólo en fases con >= 2 puestos; con 1 persona, esa persona es el líder
       fraccionHorasViaje: 1.0 // fracción de las horas de traslado que se cuentan como horas de servicio
     },
 

@@ -560,17 +560,27 @@
       plantillas: TODOS
     },
     {
-      id: 'SIT_PRECOM_LAZOS', nombre: 'Pre-comisionamiento: pruebas de lazo (loop check) y comunicaciones',
+      id: 'SIT_PRECOM_LAZOS', nombre: 'Pre-comisionamiento: pruebas de lazo (loop check) de señales alambradas',
       lugar: 'SITIO', fase: 'PRECOM', rol: 'TS',
-      // horas-persona por canal, ya incluye el par campo/sala de control
+      // horas-persona por canal, ya incluye el par campo/sala de control; modoLoopCheck=APOYA deja sólo la parte de sala
       terminos: [
         { driver: 'io_fisico', unitario: 0.9 },
-        { driver: 'io_FF', unitario: 1.2 },
-        { driver: 'io_PROFIBUS', unitario: 1.0 },
-        { driver: 'puntos_interfaz', unitario: 0.1 },
         { driver: 'io_afectado', unitario: 0.6 }
       ],
       factores: ['condicionesSitio', 'brownfield', 'modoLoopCheck'],
+      plantillas: TODOS
+    },
+    {
+      id: 'SIT_PRECOM_REDES', nombre: 'Pre-comisionamiento: integración y verificación de equipos en red (FF, Profibus, Modbus, EtherNet/IP)',
+      lugar: 'SITIO', fase: 'PRECOM', rol: 'IC',
+      // trabajo del proveedor DCS aunque el loop check lo haga un tercero: direcciones, GSD/mapas, diagnóstico, estados y comandos
+      terminos: [
+        { driver: 'io_FF', unitario: 1.2 },
+        { driver: 'io_PROFIBUS', unitario: 1.0 },
+        { driver: 'interfaces_terceros', unitario: 6 },
+        { driver: 'puntos_interfaz', unitario: 0.05 }
+      ],
+      factores: ['condicionesSitio', 'brownfield'],
       plantillas: TODOS
     },
     {

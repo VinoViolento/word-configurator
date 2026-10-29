@@ -175,6 +175,21 @@ test('modoLoopCheck por defecto: APOYA en planta nueva, EJECUTA en trabajo menor
   assert.strictEqual(motor.calcular({ tipo: 'TRABAJO_MENOR', drivers: { io_afectado: 10 } }).factores.modoLoopCheck.seleccion, 'EJECUTA');
   assert.strictEqual(motor.calcular({ tipo: 'PLANTA_NUEVA', factores: { modoLoopCheck: 'EJECUTA' }, drivers: { io_AI: 10 } }).factores.modoLoopCheck.seleccion, 'EJECUTA');
 });
+test('modoLoopCheck APOYA reduce lazos alambrados pero no la integración de equipos en red', () => {
+  const d = { io_AI: 100, io_PROFIBUS: 20, interfaces_terceros: 4 };
+  const a = motor.calcular({ tipo: 'PLANTA_NUEVA', factores: { modoLoopCheck: 'APOYA' }, drivers: d });
+  const b = motor.calcular({ tipo: 'PLANTA_NUEVA', factores: { modoLoopCheck: 'EJECUTA' }, drivers: d });
+  const h = (r, id) => r.actividades.find(x => x.id === id).horas;
+  assert.ok(h(a, 'SIT_PRECOM_LAZOS') < h(b, 'SIT_PRECOM_LAZOS') * 0.35);
+  casi(h(a, 'SIT_PRECOM_REDES'), h(b, 'SIT_PRECOM_REDES'), 0.01);
+});
+test('líder técnico no se suma en fases con una sola persona', () => {
+  const r = motor.calcular({ tipo: 'PLANTA_NUEVA', drivers: { dias_pem: 20, io_AI: 10 }, sitio: { fases: { PRECOM: { personas: 1 } } } });
+  assert.ok(r.sitio.fasesSinLider.includes('PEM'));
+  assert.strictEqual(r.sitio.fases.find(f => f.fase === 'PEM').horasLider, 0);
+  const r2 = motor.calcular({ tipo: 'PLANTA_NUEVA', drivers: { dias_pem: 20, io_AI: 10 }, parametros: { movilizacion: { liderSoloConCuadrilla: false } } });
+  assert.ok(r2.sitio.fases.find(f => f.fase === 'PEM').horasLider > 0);
+});
 test('turno desconocido lanza error', () => { assert.throws(() => motor.calcular({ tipo: 'PLANTA_NUEVA', drivers: { io_AI: 100 }, sitio: { turnos: { porDefecto: '9x9' } } })); });
 
 console.log('Servicios de sitio');

@@ -287,6 +287,7 @@
     const fases = [];
     let diasCal = 0, diasTrabajoTotal = 0, diasPersona = 0, prevDias = 0, horasLider = 0, diasLider = 0, viajesLider = 0, diasDescanso = 0, horasDescanso = 0;
     const perfil = []; // perfil de dotación por fase para contar viajes y descansos por puesto
+    const fasesSinLider = [];
     defs.forEach(fd => {
       const ov = overridesFases[fd.fase] || {};
       const acts = Object.values(calculadas).filter(x => x.lugar === 'SITIO' && x.tipo === 'DIRECTA' && (fd.agrupa ? fd.agrupa.includes(x.fase) : x.fase === fd.fase));
@@ -307,10 +308,12 @@
       diasTrabajoTotal += diasTrabajo;
       diasPersona += c * diasTrabajo;
       // Líder técnico: trabaja el mismo régimen que la cuadrilla de la fase
-      const diasLiderFase = presencia * diasTrabajo * (diasCalEfectivos / diasCalendario);
+      const aplicaLider = !params.movilizacion.liderSoloConCuadrilla || c >= 2;
+      const diasLiderFase = aplicaLider ? presencia * diasTrabajo * (diasCalEfectivos / diasCalendario) : 0;
       const horasLiderFase = diasLiderFase * hDia;
       horasLider += horasLiderFase; diasLider += diasLiderFase;
       viajesLider += diasLiderFase / turno.diasTrabajo;
+      if (!aplicaLider && presencia > 0) fasesSinLider.push(fd.fase);
       // Descanso de la cuadrilla (persona en descanso por cada puesto cuando hay relevo, o la propia cuadrilla si no)
       const descansoFase = c * diasTrabajo * turno.diasDescanso / turno.diasTrabajo;
       diasDescanso += descansoFase;
@@ -352,7 +355,7 @@
     viajes += viajesLider;
     diasPersona += diasLider;
     return {
-      fases, diasCalendario: diasCal, diasTrabajo: diasTrabajoTotal, diasLider, horasLider, presenciaLider: presencia,
+      fases, diasCalendario: diasCal, diasTrabajo: diasTrabajoTotal, diasLider, horasLider, presenciaLider: presencia, fasesSinLider,
       viajes, viajesPorPuesto, viajesLider, horasViaje: viajes * 2 * hViaje,
       diasDescanso: Math.ceil(diasDescanso), horasDescanso: r1(horasDescanso),
       diasViatico: Math.ceil(diasPersona + viajes * dViaje), rotacionDias: R, horasDia: h, unificado: !!unificado
