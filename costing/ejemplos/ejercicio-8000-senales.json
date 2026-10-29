@@ -1,0 +1,245 @@
+{
+ "proyecto": {
+  "nombre": "Ejercicio 8000 señales",
+  "emision": "Emisión Presupuestaria"
+ },
+ "tipo": "PLANTA_NUEVA",
+ "factores": {
+  "complejidad": "MEDIA",
+  "nivelDocumentacion": "ESTANDAR",
+  "libreriaTipicos": "PARCIAL",
+  "condicionesSitio": "NORMAL"
+ },
+ "gabinetes": [
+  {
+   "id": "SYS-01",
+   "tipo": "SISTEMA",
+   "plantilla": "SYS-A",
+   "controladores": 2,
+   "switches": 2
+  },
+  {
+   "id": "SYS-02",
+   "tipo": "SISTEMA",
+   "plantilla": "SYS-A",
+   "controladores": 2,
+   "switches": 2
+  },
+  {
+   "id": "SYS-03",
+   "tipo": "SISTEMA",
+   "plantilla": "SYS-A",
+   "controladores": 2,
+   "switches": 2
+  },
+  {
+   "id": "SYS-04",
+   "tipo": "SISTEMA",
+   "plantilla": "SYS-A",
+   "controladores": 2,
+   "switches": 2
+  },
+  {
+   "id": "SYS-05",
+   "tipo": "SISTEMA",
+   "plantilla": "SYS-A",
+   "controladores": 2,
+   "switches": 2
+  },
+  {
+   "id": "SYS-06",
+   "tipo": "SISTEMA",
+   "plantilla": "SYS-A",
+   "controladores": 2,
+   "switches": 2
+  },
+  {
+   "id": "RIO-01",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-A",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-02",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-A",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-03",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-A",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-04",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-A",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-05",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-A",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-06",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-A",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-07",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-A",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-08",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-A",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-09",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-B",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-10",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-B",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-11",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-B",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "RIO-12",
+   "tipo": "REMOTO",
+   "plantilla": "RIO-B",
+   "io": {
+    "AI": 100,
+    "RTD_TC": 17,
+    "AO": 27,
+    "DI": 140,
+    "DO": 50
+   }
+  },
+  {
+   "id": "NET-01",
+   "tipo": "RED",
+   "estaciones": 10,
+   "switches": 4
+  }
+ ],
+ "drivers": {
+  "io_HART": 1200,
+  "io_SERIE_MODBUS": 4000,
+  "interfaces_terceros": 16,
+  "modulos_simples": {
+   "total": 1500,
+   "unicos": 150
+  },
+  "modulos_medios": {
+   "total": 900,
+   "unicos": 120
+  },
+  "modulos_complejos": {
+   "total": 80,
+   "unicos": 30
+  },
+  "fases_secuencia": 20,
+  "graficos_overview": 6,
+  "graficos_proceso": {
+   "total": 80,
+   "unicos": 60
+  },
+  "graficos_detalle": {
+   "total": 100,
+   "unicos": 30
+  },
+  "graficos_tendencia": 60,
+  "alarmas": 3200,
+  "alarmas_racionalizar": 1000,
+  "reportes": 6,
+  "cursos_capacitacion": 4,
+  "dias_pem": 30
+ },
+ "sitio": {
+  "coberturaFAT": 0.8,
+  "rotacionDias": 20,
+  "horasViajeIda": 8
+ }
+}

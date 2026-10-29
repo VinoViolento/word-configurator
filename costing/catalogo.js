@@ -366,16 +366,35 @@
     {
       id: 'PRU_FAT_PREPARACION', nombre: 'Preparación de FAT (simulación, protocolos, montaje de pruebas)',
       lugar: 'OFICINA', fase: 'PRUEBAS', rol: 'IS', fijo: 16, fijoCondicional: true,
-      terminos: [{ driver: 'io_total', unitario: 0.05 }, { driver: 'modulos_total', unitario: 0.2 }],
+      // Los típicos se preparan una vez; las instancias sólo se tabulan (clon 0.3). Los registros Modbus se verifican en bloque.
+      terminos: [
+        { driver: 'io_fisico', unitario: 0.05 },
+        { driver: 'io_bus', unitario: 0.05 },
+        { driver: 'puntos_interfaz', unitario: 0.01 },
+        { driver: 'modulos_simples', unitario: 0.1, clon: 0.3, phi: 'modulos' },
+        { driver: 'modulos_medios', unitario: 0.2, clon: 0.3, phi: 'modulos' },
+        { driver: 'modulos_complejos', unitario: 0.6, clon: 0.3, phi: 'modulos' },
+        { driver: 'fases_secuencia', unitario: 1.5, clon: 0.3, phi: 'secuencias' },
+        { driver: 'unidades_batch', unitario: 3, clon: 0.3, phi: 'secuencias' },
+        { driver: 'sif', unitario: 1, clon: 0.3, phi: 'modulos' }
+      ],
       factores: ['nivelDocumentacion'],
       plantillas: MAYORES
     },
     {
       id: 'PRU_FAT_EJECUCION', nombre: 'Ejecución de FAT presenciada por el cliente',
       lugar: 'OFICINA', fase: 'PRUEBAS', rol: 'IS', multiplicador: 2,
+      // 2 ingenieros (uno ejecuta, otro simula). Las instancias de una clase ya probada se verifican a 30 % del costo.
       terminos: [
-        { driver: 'io_total', unitario: 0.1 },
-        { driver: 'modulos_total', unitario: 0.5 },
+        { driver: 'io_fisico', unitario: 0.1 },
+        { driver: 'io_bus', unitario: 0.1 },
+        { driver: 'puntos_interfaz', unitario: 0.03 },
+        { driver: 'modulos_simples', unitario: 0.2, clon: 0.3, phi: 'modulos' },
+        { driver: 'modulos_medios', unitario: 0.5, clon: 0.3, phi: 'modulos' },
+        { driver: 'modulos_complejos', unitario: 1.5, clon: 0.3, phi: 'modulos' },
+        { driver: 'fases_secuencia', unitario: 4, clon: 0.3, phi: 'secuencias' },
+        { driver: 'unidades_batch', unitario: 6, clon: 0.3, phi: 'secuencias' },
+        { driver: 'sif', unitario: 2, clon: 0.3, phi: 'modulos' },
         { driver: 'graficos_total', unitario: 1 },
         { driver: 'interfaces_terceros', unitario: 4 }
       ],
@@ -405,9 +424,17 @@
     {
       id: 'DOC_PROTOCOLOS', nombre: 'Protocolos de prueba (FAT / SAT / loop check)',
       lugar: 'OFICINA', fase: 'DOCUMENTACION', rol: 'IS', fijo: 12, fijoCondicional: true,
+      // Un protocolo por típico; las instancias son filas de tabla (clon 0.2).
       terminos: [
-        { driver: 'io_total', unitario: 0.05 },
-        { driver: 'modulos_total', unitario: 0.3 },
+        { driver: 'io_fisico', unitario: 0.05 },
+        { driver: 'io_bus', unitario: 0.05 },
+        { driver: 'puntos_interfaz', unitario: 0.01 },
+        { driver: 'modulos_simples', unitario: 0.15, clon: 0.2, phi: 'modulos' },
+        { driver: 'modulos_medios', unitario: 0.3, clon: 0.2, phi: 'modulos' },
+        { driver: 'modulos_complejos', unitario: 0.8, clon: 0.2, phi: 'modulos' },
+        { driver: 'fases_secuencia', unitario: 2, clon: 0.2, phi: 'secuencias' },
+        { driver: 'unidades_batch', unitario: 3, clon: 0.2, phi: 'secuencias' },
+        { driver: 'sif', unitario: 1, clon: 0.2, phi: 'modulos' },
         { driver: 'io_afectado', unitario: 0.05 },
         { driver: 'graficos_mod_total', unitario: 0.3 },
         { driver: 'modulos_mod_total', unitario: 0.5 }
@@ -579,9 +606,17 @@
     {
       id: 'SIT_SAT', nombre: 'SAT (pruebas de aceptación en sitio) presenciadas',
       lugar: 'SITIO', fase: 'SAT', rol: 'IC', fijo: 16, fijoCondicional: true, multiplicador: 2,
+      // Presenciada: 2 personas. Instancias de clases ya aceptadas a 30 %.
       terminos: [
-        { driver: 'io_total', unitario: 0.05 },
-        { driver: 'modulos_total', unitario: 0.2 },
+        { driver: 'io_fisico', unitario: 0.05 },
+        { driver: 'io_bus', unitario: 0.05 },
+        { driver: 'puntos_interfaz', unitario: 0.01 },
+        { driver: 'modulos_simples', unitario: 0.1, clon: 0.3, phi: 'modulos' },
+        { driver: 'modulos_medios', unitario: 0.2, clon: 0.3, phi: 'modulos' },
+        { driver: 'modulos_complejos', unitario: 0.6, clon: 0.3, phi: 'modulos' },
+        { driver: 'fases_secuencia', unitario: 2, clon: 0.3, phi: 'secuencias' },
+        { driver: 'unidades_batch', unitario: 3, clon: 0.3, phi: 'secuencias' },
+        { driver: 'sif', unitario: 1, clon: 0.3, phi: 'modulos' },
         { driver: 'graficos_total', unitario: 0.4 },
         { driver: 'io_afectado', unitario: 0.05 },
         { driver: 'graficos_mod_total', unitario: 0.3 },

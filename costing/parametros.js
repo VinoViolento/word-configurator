@@ -28,7 +28,7 @@
       horasDiaSitio: 10,
       diasSemana: 5,
       horasSemanaEfectivas: 32,   // horas productivas/semana por ingeniero (para estimar duración)
-      equipoMaximo: 8,            // ingenieros simultáneos máximos (para estimar duración)
+      equipoMaximo: 15,           // ingenieros simultáneos máximos (para estimar duración)
       horasPorIngenieroEquipo: 400 // cada ~400 h de alcance suma un ingeniero al equipo
     },
 

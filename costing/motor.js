@@ -443,6 +443,8 @@
   function optimizarCuadrillas(entrada, tarifas, opciones) {
     opciones = opciones || {};
     const max = opciones.personasMaximas || 6;
+    // Fases cuyo esfuerzo es un dato en días-persona (no se gana nada cambiando la cuadrilla)
+    const noOptimizables = new Set(opciones.fasesFijas || ['PEM', 'CAPACITACION']);
     const objetivo = (ent) => {
       const r = calcular(ent);
       const c = tarifas ? costear(r, tarifas) : null;
@@ -453,6 +455,7 @@
     const evaluaciones = [];
     const personasPorFase = {};
     base.r.sitio.fases.forEach(f => {
+      if (noOptimizables.has(f.fase)) return;
       let mejor = { personas: f.personas, valor: Infinity };
       for (let c = 1; c <= max; c++) {
         const e2 = deepMerge(ent, { sitio: { fases: { [f.fase]: { personas: c } } } });
