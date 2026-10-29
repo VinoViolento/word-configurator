@@ -570,7 +570,7 @@
         { driver: 'puntos_interfaz', unitario: 0.1 },
         { driver: 'io_afectado', unitario: 0.6 }
       ],
-      factores: ['condicionesSitio', 'brownfield'],
+      factores: ['condicionesSitio', 'brownfield', 'modoLoopCheck'],
       plantillas: TODOS
     },
     {

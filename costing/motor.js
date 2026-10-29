@@ -134,6 +134,7 @@
     val.nivelDocumentacion = elegir('nivelDocumentacion', 'ESTANDAR');
     val.libreriaTipicos = elegir('libreriaTipicos', 'SIN');
     val.condicionesSitio = elegir('condicionesSitio', 'NORMAL');
+    val.modoLoopCheck = elegir('modoLoopCheck', 'EJECUTA');
     ['reusoSoftware', 'reusoHardware', 'brownfield'].forEach(k => {
       val[k] = { sel: tipo, v: f[k] != null && typeof f[k] === 'number' ? f[k] : tabla[k][tipo] };
     });
@@ -269,7 +270,7 @@
     const kappa = params.cuadrillas.kappa, effMin = params.cuadrillas.eficienciaMinima, cMax = params.cuadrillas.personasMaximas;
     const sit = entrada.sitio || {};
     const R = sit.rotacionDias || params.movilizacion.rotacionDias;
-    const hViaje = sit.horasViajeIda != null ? sit.horasViajeIda : params.movilizacion.horasViajeIda;
+    const hViaje = (sit.horasViajeIda != null ? sit.horasViajeIda : params.movilizacion.horasViajeIda) * params.movilizacion.fraccionHorasViaje;
     const dViaje = params.movilizacion.diasViajePorViaje;
     const presencia = sit.presenciaLider != null ? sit.presenciaLider : (plantilla.presenciaLider != null ? plantilla.presenciaLider : params.movilizacion.presenciaLider);
     const overridesFases = sit.fases || {};

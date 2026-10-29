@@ -48,6 +48,9 @@
       /** Reúso del sistema existente (lo fija la plantilla de tipo de proyecto). */
       reusoSoftware: { PLANTA_NUEVA: 1.0, EXPANSION: 0.85, MIGRACION: 0.75, TRABAJO_MENOR: 0.9 }, // MIGRACION: la conversión (SW_MIGRACION_BD) cubre parte de la configuración
       reusoHardware: { PLANTA_NUEVA: 1.0, EXPANSION: 0.9, MIGRACION: 0.95, TRABAJO_MENOR: 1.0 },
+      /** Quién ejecuta el loop check: el proveedor DCS con su cuadrilla (EJECUTA) o el contratista E&I,
+       *  con el proveedor confirmando desde sala de control (APOYA). Aplica a SIT_PRECOM_LAZOS. */
+      modoLoopCheck: { EJECUTA: 1.0, APOYA: 0.3 },
       /** Planta en operación (brownfield): coordinación, permisos, ventanas. Aplica a sitio. */
       brownfield: { PLANTA_NUEVA: 1.0, EXPANSION: 1.15, MIGRACION: 1.25, TRABAJO_MENOR: 1.1 }
     },
@@ -84,7 +87,8 @@
       rotacionDias: 20,     // días continuos en sitio antes de rotar (viaje ida/vuelta)
       horasViajeIda: 8,     // horas-persona por tramo (ida o vuelta)
       diasViajePorViaje: 2, // días de viático que consume un viaje ida+vuelta
-      presenciaLider: 1.0   // fracción de los días calendario que el líder técnico está en sitio
+      presenciaLider: 1.0,  // fracción de los días calendario que el líder técnico está en sitio
+      fraccionHorasViaje: 1.0 // fracción de las horas de traslado que se cuentan como horas de servicio
     },
 
     /**
