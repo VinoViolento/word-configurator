@@ -121,7 +121,7 @@
   }
 
   // ───────────────────────── factores ─────────────────────────
-  function resolverFactores(entrada, tipo, params, avisos) {
+  function resolverFactores(entrada, tipo, params, avisos, plantilla) {
     const f = entrada.factores || {};
     const val = {};
     const tabla = params.factores;
@@ -134,7 +134,7 @@
     val.nivelDocumentacion = elegir('nivelDocumentacion', 'ESTANDAR');
     val.libreriaTipicos = elegir('libreriaTipicos', 'SIN');
     val.condicionesSitio = elegir('condicionesSitio', 'NORMAL');
-    val.modoLoopCheck = elegir('modoLoopCheck', 'EJECUTA');
+    val.modoLoopCheck = elegir('modoLoopCheck', plantilla.modoLoopCheckPorDefecto || 'EJECUTA');
     ['reusoSoftware', 'reusoHardware', 'brownfield'].forEach(k => {
       val[k] = { sel: tipo, v: f[k] != null && typeof f[k] === 'number' ? f[k] : tabla[k][tipo] };
     });
@@ -373,7 +373,7 @@
     if (!plantilla) throw new Error(`Tipo de proyecto desconocido: ${tipo}. Use ${Object.keys(PLANTILLAS.PLANTILLAS).join(', ')}`);
 
     const { drivers, detalleGabinetes, overridesAlcance, sinSitioAlcance } = construirDrivers(entrada, plantilla, avisos);
-    const factores = resolverFactores(entrada, tipo, params, avisos);
+    const factores = resolverFactores(entrada, tipo, params, avisos, plantilla);
     const coberturaFAT = (entrada.sitio && entrada.sitio.coberturaFAT != null) ? entrada.sitio.coberturaFAT : params.transferenciaFAT.coberturaPorDefecto[tipo];
     const actividades = seleccionarActividades(entrada, tipo, plantilla, overridesAlcance, sinSitioAlcance, avisos);
     const ctx = { drivers, params, factores, tipo, coberturaFAT, avisos, semanas: 0 };

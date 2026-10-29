@@ -44,6 +44,7 @@
       overrides: {},
       fasesSitio: FASES_SITIO_BASE,
       presenciaLider: 1.0,
+      modoLoopCheckPorDefecto: 'APOYA',   // greenfield con EPC: el contratista E&I ejecuta los lazos en terreno
       documentosEntregablesPorDefecto: 14,
       diasPemPorDefecto: 10
     },
@@ -59,6 +60,7 @@
       },
       fasesSitio: FASES_SITIO_BASE,
       presenciaLider: 0.5,
+      modoLoopCheckPorDefecto: 'EJECUTA', // el proveedor suele ir solo
       documentosEntregablesPorDefecto: 10,
       diasPemPorDefecto: 5
     },
@@ -71,6 +73,7 @@
       },
       fasesSitio: FASES_SITIO_BASE,
       presenciaLider: 1.0,
+      modoLoopCheckPorDefecto: 'APOYA',
       documentosEntregablesPorDefecto: 14,
       diasPemPorDefecto: 10
     },
@@ -95,6 +98,7 @@
       // Una misma cuadrilla hace todo el trabajo de sitio de corrido (sin fases separadas en calendario).
       calendarioUnificado: { personas: 1, diasObjetivo: 10 },
       presenciaLider: 0,   // el ingeniero de comisionamiento actúa de líder
+      modoLoopCheckPorDefecto: 'EJECUTA',
       documentosEntregablesPorDefecto: 3,
       diasPemPorDefecto: 0
     }

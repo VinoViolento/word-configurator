@@ -133,6 +133,7 @@ cuenta únicos por firma (tipo + lista de tarjetas) cuando no hay clave.
 | `reusoSoftware` (por tipo) | NUEVA 1 · EXPANSION 0,85 · MIGRACION 0,75 · MENOR 0,9 | software |
 | `reusoHardware` (por tipo) | NUEVA 1 · EXPANSION 0,9 · MIGRACION 0,95 · MENOR 1 | hardware |
 | `brownfield` (por tipo) | NUEVA 1 · EXPANSION 1,15 · MIGRACION 1,25 · MENOR 1,1 | sitio (planta operando) |
+| `modoLoopCheck` | EJECUTA 1 · APOYA 0,3 (defecto APOYA en planta nueva y migración, EJECUTA en expansión y menor) | pruebas de lazo en sitio: quién pone la pareja de terreno |
 
 Los factores son multiplicativos e independientes; cada actividad del catálogo declara cuáles le
 aplican, de modo que un cambio de nivel documental no infla el armado de gabinetes, por ejemplo.

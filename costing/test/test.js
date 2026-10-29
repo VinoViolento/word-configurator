@@ -170,6 +170,11 @@ test('turno por fase y descanso facturado opcional', () => {
   assert.ok(r.actividades.find(a => a.id === 'SIT_DESCANSO_PRECOM').horas > 0);
   casi(motor.serviciosSitio(r).total, r.horas.porLugar.SITIO, 1.0);
 });
+test('modoLoopCheck por defecto: APOYA en planta nueva, EJECUTA en trabajo menor, sobreescribible', () => {
+  assert.strictEqual(motor.calcular({ tipo: 'PLANTA_NUEVA', drivers: { io_AI: 10 } }).factores.modoLoopCheck.seleccion, 'APOYA');
+  assert.strictEqual(motor.calcular({ tipo: 'TRABAJO_MENOR', drivers: { io_afectado: 10 } }).factores.modoLoopCheck.seleccion, 'EJECUTA');
+  assert.strictEqual(motor.calcular({ tipo: 'PLANTA_NUEVA', factores: { modoLoopCheck: 'EJECUTA' }, drivers: { io_AI: 10 } }).factores.modoLoopCheck.seleccion, 'EJECUTA');
+});
 test('turno desconocido lanza error', () => { assert.throws(() => motor.calcular({ tipo: 'PLANTA_NUEVA', drivers: { io_AI: 100 }, sitio: { turnos: { porDefecto: '9x9' } } })); });
 
 console.log('Servicios de sitio');
